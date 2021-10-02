@@ -177,10 +177,10 @@ void ALudumDare49Character::ToggleLockOn()
 		// if we haven't detected the boss yet, do it here
 		if (Boss == nullptr)
 		{
-			TObjectPtr<AActor> actor = UGameplayStatics::GetActorOfClass(GetWorld(), ABoss::StaticClass());
-			if (actor != nullptr && actor->IsA(ABoss::StaticClass()))
+			TObjectPtr<AActor> actor = UGameplayStatics::GetActorOfClass(GetWorld(), ABossCharacter::StaticClass());
+			if (actor != nullptr && actor->IsA(ABossCharacter::StaticClass()))
 			{
-				Boss = Cast<ABoss>(actor);
+				Boss = Cast<ABossCharacter>(actor);
 			}
 		}
 	}

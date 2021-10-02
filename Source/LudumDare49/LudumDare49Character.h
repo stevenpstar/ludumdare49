@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "Boss.h"
+#include "BossCharacter.h"
 #include "LudumDare49Character.generated.h"
 
 UCLASS(config=Game)
@@ -31,7 +31,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseLookUpRate;
 
-	TObjectPtr<ABoss> Boss;
+	TObjectPtr<ABossCharacter> Boss;
 
 	/** Toggle Lock on */
 	void ToggleLockOn();

@@ -3,13 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Pawn.h"
+#include "GameFramework/Character.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Boss.generated.h"
 
 UCLASS()
-class LUDUMDARE49_API ABoss : public APawn
+class LUDUMDARE49_API ABoss : public ACharacter
 {
 	GENERATED_BODY()
 
@@ -32,8 +32,4 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	// Skeletal Mesh Component of the boss
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TObjectPtr<USkeletalMeshComponent> Mesh;
 };
