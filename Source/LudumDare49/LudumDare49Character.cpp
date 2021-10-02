@@ -53,6 +53,9 @@ ALudumDare49Character::ALudumDare49Character()
 	//Set Default Jump Height
 	JumpHeight = 600.0f;
 
+	//default sprinting
+	sprinting = false;
+
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -78,6 +81,10 @@ void ALudumDare49Character::SetupPlayerInputComponent(class UInputComponent* Pla
 	check(PlayerInputComponent);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ALudumDare49Character::DoubleJump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
+
+	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ALudumDare49Character::StartSprint);
+	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ALudumDare49Character::StopSprint);
+
 	PlayerInputComponent->BindAction("LockOn", IE_Released, this, &ALudumDare49Character::ToggleLockOn);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &ALudumDare49Character::MoveForward);
@@ -191,6 +198,10 @@ void ALudumDare49Character::ToggleLockOn()
 		CameraBoom->bInheritYaw = true;
 		CameraBoom->bInheritRoll = false;
 		GetCharacterMovement()->bOrientRotationToMovement = false;
+		if (sprinting)
+		{
+			StopSprint();
+		}
 
 		// if we haven't detected the boss yet, do it here
 		if (Boss == nullptr)
@@ -215,6 +226,23 @@ void ALudumDare49Character::Tick(float deltaTime)
 		FRotator lockedRotation = FRotator(0.0f, GetActorQuat().Rotator().Yaw, GetActorQuat().Rotator().Roll);
 		SetActorRotation(lockedRotation);
 	}
+	if (sprinting)
+	{
+		if (stamina > 0.0f) {
+			stamina -= 1.2f;
+		}
+		else
+		{
+			StopSprint();
+		}
+	}
+	if (!sprinting && !dodging)
+	{
+		if (stamina < 100.0f)
+		{
+			stamina += 0.8f;
+		}
+	}
 	Super::Tick(deltaTime);
 }
 
@@ -226,6 +254,11 @@ void ALudumDare49Character::DoubleJump()
 		float velY = (doubleJt < 1) ? GetVelocity().Y / 4 : 0;
 		ACharacter::LaunchCharacter(FVector(velX, velY, JumpHeight), false, true);
 		doubleJt++;
+		stamina -= 25.0f;
+		if (stamina < 0)
+		{
+			stamina = 0.0f;
+		}
 	}
 }
 
@@ -256,5 +289,20 @@ void ALudumDare49Character::DepleteHealth(float amount)
 	{
 
 	}
+}
+
+void ALudumDare49Character::StartSprint()
+{
+	if (!LockedOn)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = sprintSpeed;
+		sprinting = true;
+	}
+}
+
+void ALudumDare49Character::StopSprint()
+{
+	GetCharacterMovement()->MaxWalkSpeed = regularSpeed;
+	sprinting = false;
 }
 

@@ -52,12 +52,20 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float health;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float stamina;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float sprintSpeed;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float regularSpeed;
+
 
 	bool blocking;
 	bool invincible;
 	bool dodging;
+	bool sprinting;
 
 protected:
 
@@ -96,6 +104,9 @@ protected:
 	void DepleteHealth(float amount);
 
 	void HealHealth(float amount);
+
+	void StartSprint();
+	void StopSprint();
 
 	// overriding the Take Damage function
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) override;
