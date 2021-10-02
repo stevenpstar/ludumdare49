@@ -36,7 +36,7 @@ ALudumDare49Character::ALudumDare49Character()
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 300.0f; // The camera follows at this distance behind the character	
+	CameraBoom->TargetArmLength = 400.0f; // The camera follows at this distance behind the character	
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
 
 	// Create a follow camera
@@ -161,7 +161,7 @@ void ALudumDare49Character::ToggleLockOn()
 		if (!LockedOn)
 		{
 			CameraBoom->bUsePawnControlRotation = true;
-			CameraBoom->bInheritPitch = false;
+			CameraBoom->bInheritPitch = true;
 			CameraBoom->bInheritYaw = true;
 			CameraBoom->bInheritRoll = true;
 			GetCharacterMovement()->bOrientRotationToMovement = true;
@@ -192,7 +192,10 @@ void ALudumDare49Character::Tick(float deltaTime)
 	{
 		FVector playerPosition = GetActorLocation();
 		FVector bossPosition = Boss->GetActorLocation();
+		FVector flat = FVector(0.0f);
 		SetActorRotation(FRotationMatrix::MakeFromX(bossPosition - playerPosition).Rotator());
+		FRotator lockedRotation = FRotator(0.0f, GetActorQuat().Rotator().Yaw, GetActorQuat().Rotator().Roll);
+		SetActorRotation(lockedRotation);
 	}
 	Super::Tick(deltaTime);
 }
