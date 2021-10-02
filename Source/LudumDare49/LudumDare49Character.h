@@ -40,6 +40,14 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	/** Function to handle jumping and double jumping */
+	UFUNCTION()
+		void DoubleJump();
+	/** Double Jump Counter */
+	UPROPERTY()
+		int doubleJt;
+
+	float JumpHeight;
 protected:
 
 	/** Resets HMD orientation in VR. */
@@ -73,6 +81,8 @@ protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	// End of APawn interface
+
+	virtual void Landed(const FHitResult& Hit) override;
 
 public:
 	/** Returns CameraBoom subobject **/

@@ -49,6 +49,10 @@ ALudumDare49Character::ALudumDare49Character()
 
 	//Set Default Locked On State to false
 	LockedOn = false;
+
+	//Set Default Jump Height
+	JumpHeight = 600.0f;
+
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -58,7 +62,7 @@ void ALudumDare49Character::SetupPlayerInputComponent(class UInputComponent* Pla
 {
 	// Set up gameplay key bindings
 	check(PlayerInputComponent);
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ALudumDare49Character::DoubleJump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 	PlayerInputComponent->BindAction("LockOn", IE_Released, this, &ALudumDare49Character::ToggleLockOn);
 
@@ -198,4 +202,18 @@ void ALudumDare49Character::Tick(float deltaTime)
 		SetActorRotation(lockedRotation);
 	}
 	Super::Tick(deltaTime);
+}
+
+void ALudumDare49Character::DoubleJump()
+{
+	if (Controller != nullptr && doubleJt <= 1)
+	{
+		ACharacter::LaunchCharacter(FVector(0, 0, JumpHeight), false, true);
+		doubleJt++;
+	}
+}
+
+void ALudumDare49Character::Landed(const FHitResult& hit)
+{
+	doubleJt = 0;
 }
