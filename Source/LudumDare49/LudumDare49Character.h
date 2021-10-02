@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Boss.h"
 #include "LudumDare49Character.generated.h"
 
 UCLASS(config=Game)
@@ -18,6 +19,7 @@ class ALudumDare49Character : public ACharacter
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FollowCamera;
+
 public:
 	ALudumDare49Character();
 
@@ -28,6 +30,15 @@ public:
 	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseLookUpRate;
+
+	TObjectPtr<ABoss> Boss;
+
+	/** Toggle Lock on */
+	void ToggleLockOn();
+
+	bool LockedOn;
+
+	virtual void Tick(float DeltaTime) override;
 
 protected:
 

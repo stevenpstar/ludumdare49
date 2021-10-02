@@ -8,6 +8,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
+#include <Runtime/Engine/Classes/Kismet/GameplayStatics.h>
 
 //////////////////////////////////////////////////////////////////////////
 // ALudumDare49Character
@@ -22,7 +23,7 @@ ALudumDare49Character::ALudumDare49Character()
 	BaseLookUpRate = 45.f;
 
 	// Don't rotate when the controller rotates. Let that just affect the camera.
-	bUseControllerRotationPitch = false;
+	bUseControllerRotationPitch = true;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
 
@@ -45,6 +46,9 @@ ALudumDare49Character::ALudumDare49Character()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
+
+	//Set Default Locked On State to false
+	LockedOn = false;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -56,6 +60,7 @@ void ALudumDare49Character::SetupPlayerInputComponent(class UInputComponent* Pla
 	check(PlayerInputComponent);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
+	PlayerInputComponent->BindAction("LockOn", IE_Released, this, &ALudumDare49Character::ToggleLockOn);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &ALudumDare49Character::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ALudumDare49Character::MoveRight);
@@ -119,7 +124,11 @@ void ALudumDare49Character::MoveForward(float Value)
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
 
 		// get forward vector
-		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+		FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+		if (LockedOn)
+		{
+			Direction = FollowCamera->GetForwardVector();
+		}	
 		AddMovementInput(Direction, Value);
 	}
 }
@@ -133,8 +142,57 @@ void ALudumDare49Character::MoveRight(float Value)
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
 	
 		// get right vector 
-		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+		FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+		//if we are locked on
+		if (LockedOn)
+		{
+			Direction = FollowCamera->GetRightVector();
+		}
 		// add movement in that direction
 		AddMovementInput(Direction, Value);
 	}
+}
+
+void ALudumDare49Character::ToggleLockOn()
+{
+	if (Controller != nullptr)
+	{
+		LockedOn = !LockedOn;
+		if (!LockedOn)
+		{
+			CameraBoom->bUsePawnControlRotation = true;
+			CameraBoom->bInheritPitch = false;
+			CameraBoom->bInheritYaw = true;
+			CameraBoom->bInheritRoll = true;
+			GetCharacterMovement()->bOrientRotationToMovement = true;
+			return;
+		}
+
+		CameraBoom->bUsePawnControlRotation = false;
+		CameraBoom->bInheritPitch = false;
+		CameraBoom->bInheritYaw = true;
+		CameraBoom->bInheritRoll = false;
+		GetCharacterMovement()->bOrientRotationToMovement = false;
+
+		// if we haven't detected the boss yet, do it here
+		if (Boss == nullptr)
+		{
+			TObjectPtr<AActor> actor = UGameplayStatics::GetActorOfClass(GetWorld(), ABoss::StaticClass());
+			if (actor != nullptr && actor->IsA(ABoss::StaticClass()))
+			{
+				Boss = Cast<ABoss>(actor);
+			}
+		}
+	}
+}
+
+void ALudumDare49Character::Tick(float deltaTime)
+{
+	if (LockedOn && Controller != nullptr && Boss != nullptr)
+	{
+		FVector playerPosition = GetActorLocation();
+		FVector bossPosition = Boss->GetActorLocation();
+		SetActorRotation(FRotationMatrix::MakeFromX(bossPosition - playerPosition).Rotator());
+	}
+	Super::Tick(deltaTime);
 }
