@@ -58,6 +58,20 @@ ALudumDare49Character::ALudumDare49Character()
 //////////////////////////////////////////////////////////////////////////
 // Input
 
+float ALudumDare49Character::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, 
+	AController* EventInstigator, AActor* DamageCauser)
+{
+	const float Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	if (health > 0.0f)
+	{
+		health -= Damage;
+		if (health <= 0.0f)
+
+		return Damage;
+	}
+	return 0.0f;
+}
+
 void ALudumDare49Character::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
 	// Set up gameplay key bindings
@@ -208,7 +222,9 @@ void ALudumDare49Character::DoubleJump()
 {
 	if (Controller != nullptr && doubleJt <= 1)
 	{
-		ACharacter::LaunchCharacter(FVector(0, 0, JumpHeight), false, true);
+		float velX = (doubleJt < 1) ? GetVelocity().X / 4 : 0;
+		float velY = (doubleJt < 1) ? GetVelocity().Y / 4 : 0;
+		ACharacter::LaunchCharacter(FVector(velX, velY, JumpHeight), false, true);
 		doubleJt++;
 	}
 }
@@ -217,3 +233,28 @@ void ALudumDare49Character::Landed(const FHitResult& hit)
 {
 	doubleJt = 0;
 }
+
+void ALudumDare49Character::Dodge()
+{
+	if (Controller != nullptr)
+	{
+
+	}
+}
+
+void ALudumDare49Character::DepleteStamina(float amount) 
+{
+	if (Controller != nullptr)
+	{
+
+	}
+}
+
+void ALudumDare49Character::DepleteHealth(float amount)
+{
+	if (Controller != nullptr)
+	{
+
+	}
+}
+

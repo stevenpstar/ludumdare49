@@ -47,7 +47,18 @@ public:
 	UPROPERTY()
 		int doubleJt;
 
-	float JumpHeight;
+	UPROPERTY(VisibleAnywhere)
+		float JumpHeight;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float health;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float stamina;
+
+	bool blocking;
+	bool invincible;
+	bool dodging;
+
 protected:
 
 	/** Resets HMD orientation in VR. */
@@ -76,6 +87,18 @@ protected:
 
 	/** Handler for when a touch input stops. */
 	void TouchStopped(ETouchIndex::Type FingerIndex, FVector Location);
+
+	/** Dodging */
+	void Dodge();
+
+	void DepleteStamina(float amount);
+
+	void DepleteHealth(float amount);
+
+	void HealHealth(float amount);
+
+	// overriding the Take Damage function
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) override;
 
 protected:
 	// APawn interface
