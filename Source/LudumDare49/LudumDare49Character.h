@@ -67,6 +67,9 @@ public:
 	bool dodging;
 	bool sprinting;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool doubleJumping;
+
 protected:
 
 	/** Resets HMD orientation in VR. */

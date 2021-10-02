@@ -51,7 +51,7 @@ ALudumDare49Character::ALudumDare49Character()
 	LockedOn = false;
 
 	//Set Default Jump Height
-	JumpHeight = 600.0f;
+	JumpHeight = 550.0f;
 
 	//default sprinting
 	sprinting = false;
@@ -243,6 +243,10 @@ void ALudumDare49Character::Tick(float deltaTime)
 			stamina += 0.8f;
 		}
 	}
+	if (doubleJumping)
+	{
+		//doubleJumping = false;
+	}
 	Super::Tick(deltaTime);
 }
 
@@ -250,6 +254,7 @@ void ALudumDare49Character::DoubleJump()
 {
 	if (Controller != nullptr && doubleJt <= 1)
 	{
+		doubleJumping = (doubleJt == 1) ? true : false;
 		float velX = (doubleJt < 1) ? GetVelocity().X / 4 : 0;
 		float velY = (doubleJt < 1) ? GetVelocity().Y / 4 : 0;
 		ACharacter::LaunchCharacter(FVector(velX, velY, JumpHeight), false, true);
@@ -265,6 +270,7 @@ void ALudumDare49Character::DoubleJump()
 void ALudumDare49Character::Landed(const FHitResult& hit)
 {
 	doubleJt = 0;
+	doubleJumping = false;
 }
 
 void ALudumDare49Character::Dodge()
