@@ -47,6 +47,12 @@ public:
 	UPROPERTY()
 		int doubleJt;
 
+	UFUNCTION()
+		void EnableDamage();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int attackCounter;
+
 	UPROPERTY(VisibleAnywhere)
 		float JumpHeight;
 
@@ -66,6 +72,7 @@ public:
 	bool invincible;
 	bool dodging;
 	bool sprinting;
+	bool stunned;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool doubleJumping;
@@ -113,6 +120,8 @@ protected:
 
 	// overriding the Take Damage function
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) override;
+
+	void Attack();
 
 protected:
 	// APawn interface

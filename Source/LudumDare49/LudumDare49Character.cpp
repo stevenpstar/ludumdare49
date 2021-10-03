@@ -31,7 +31,7 @@ ALudumDare49Character::ALudumDare49Character()
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f); // ...at this rotation rate
 	GetCharacterMovement()->JumpZVelocity = 600.f;
-	GetCharacterMovement()->AirControl = 0.2f;
+	GetCharacterMovement()->AirControl = 0.8f;
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -84,6 +84,8 @@ void ALudumDare49Character::SetupPlayerInputComponent(class UInputComponent* Pla
 
 	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ALudumDare49Character::StartSprint);
 	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ALudumDare49Character::StopSprint);
+
+	PlayerInputComponent->BindAction("LAttack", IE_Released, this, &ALudumDare49Character::Attack);
 
 	PlayerInputComponent->BindAction("LockOn", IE_Released, this, &ALudumDare49Character::ToggleLockOn);
 
@@ -310,5 +312,20 @@ void ALudumDare49Character::StopSprint()
 {
 	GetCharacterMovement()->MaxWalkSpeed = regularSpeed;
 	sprinting = false;
+}
+
+void ALudumDare49Character::Attack()
+{
+	if (GetCharacterMovement()->IsFalling()) { return; }
+	GetCharacterMovement()->MaxWalkSpeed = 0.0f;
+	if (attackCounter < 1)
+	{
+		attackCounter = 1;
+	}
+}
+
+void ALudumDare49Character::EnableDamage()
+{
+
 }
 
