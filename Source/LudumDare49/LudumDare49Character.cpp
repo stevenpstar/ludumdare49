@@ -56,6 +56,9 @@ ALudumDare49Character::ALudumDare49Character()
 	//default sprinting
 	sprinting = false;
 
+	//default dodging
+	dodging = false;
+
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -312,6 +315,11 @@ void ALudumDare49Character::StopSprint()
 {
 	GetCharacterMovement()->MaxWalkSpeed = regularSpeed;
 	sprinting = false;
+	if (LockedOn)
+	{
+		dodging = true;
+		GetCharacterMovement()->MaxWalkSpeed = 0.0f;
+	}
 }
 
 void ALudumDare49Character::Attack()
@@ -326,6 +334,13 @@ void ALudumDare49Character::Attack()
 
 void ALudumDare49Character::EnableDamage()
 {
+
+}
+
+void ALudumDare49Character::stopDodging()
+{
+	dodging = false;
+	GetCharacterMovement()->MaxWalkSpeed = regularSpeed;
 
 }
 

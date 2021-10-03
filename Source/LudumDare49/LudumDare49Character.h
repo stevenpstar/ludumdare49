@@ -63,19 +63,27 @@ public:
 		float stamina;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool dodging;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float sprintSpeed;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float regularSpeed;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TObjectPtr<AActor> heldWeapon;
+
 
 	bool blocking;
 	bool invincible;
-	bool dodging;
 	bool sprinting;
 	bool stunned;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool doubleJumping;
+
+	UFUNCTION(BlueprintCallable)
+		void stopDodging();
 
 protected:
 
