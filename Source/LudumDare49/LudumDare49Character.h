@@ -69,6 +69,8 @@ public:
 		float sprintSpeed;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float regularSpeed;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float defaultCameraDistance;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TObjectPtr<AActor> heldWeapon;
@@ -83,11 +85,18 @@ public:
 	bool sprinting;
 	bool stunned;
 
+	float desiredCameraDistance;
+	float currentCameraDistance;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool doubleJumping;
 
 	UFUNCTION(BlueprintCallable)
 		void stopDodging();
+	UFUNCTION(BlueprintCallable)
+		void HandleCameraDistance();
+	UFUNCTION(BlueprintCallable)
+		void UpdateCameraDistance(float cameraDistance);
 
 protected:
 

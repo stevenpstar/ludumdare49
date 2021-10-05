@@ -18,6 +18,10 @@ ALudumDare49Character::ALudumDare49Character()
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
+	defaultCameraDistance = 400.0f;
+	desiredCameraDistance = defaultCameraDistance;
+	currentCameraDistance = defaultCameraDistance;
+
 	// set our turn rates for input
 	BaseTurnRate = 45.f;
 	BaseLookUpRate = 45.f;
@@ -36,7 +40,7 @@ ALudumDare49Character::ALudumDare49Character()
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 400.0f; // The camera follows at this distance behind the character	
+	CameraBoom->TargetArmLength = defaultCameraDistance; // The camera follows at this distance behind the character	
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
 
 	// Create a follow camera
@@ -191,8 +195,11 @@ void ALudumDare49Character::ToggleLockOn()
 		if (!LockedOn)
 		{
 			UnlockPlayerRotation();
+			desiredCameraDistance = defaultCameraDistance;
 			return;
 		}
+		// magic number for testing
+		desiredCameraDistance = 600.0f;
 
 		LockPlayerRotation();
 		// if we haven't detected the boss yet, do it here
@@ -232,7 +239,8 @@ void ALudumDare49Character::Tick(float deltaTime)
 		HandleLockingOn(deltaTime);
 	}
 	HandleStamina();
-		Super::Tick(deltaTime);
+	HandleCameraDistance();
+	Super::Tick(deltaTime);
 }
 
 void ALudumDare49Character::HandleLockingOn(float deltaTime)
@@ -354,3 +362,20 @@ void ALudumDare49Character::stopDodging()
 
 }
 
+void ALudumDare49Character::HandleCameraDistance()
+{
+	if (currentCameraDistance > desiredCameraDistance)
+	{
+		currentCameraDistance -= 10.0f;
+	}
+	else {
+		currentCameraDistance += 10.0f;
+	}
+
+	UpdateCameraDistance(currentCameraDistance);
+}
+
+void ALudumDare49Character::UpdateCameraDistance(float cameraDistance)
+{
+	CameraBoom->TargetArmLength = cameraDistance; 
+}
