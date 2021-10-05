@@ -190,24 +190,11 @@ void ALudumDare49Character::ToggleLockOn()
 		LockedOn = !LockedOn;
 		if (!LockedOn)
 		{
-			CameraBoom->bUsePawnControlRotation = true;
-			CameraBoom->bInheritPitch = true;
-			CameraBoom->bInheritYaw = true;
-			CameraBoom->bInheritRoll = true;
-			GetCharacterMovement()->bOrientRotationToMovement = true;
+			UnlockPlayerRotation();
 			return;
 		}
 
-		CameraBoom->bUsePawnControlRotation = false;
-		CameraBoom->bInheritPitch = false;
-		CameraBoom->bInheritYaw = true;
-		CameraBoom->bInheritRoll = false;
-		GetCharacterMovement()->bOrientRotationToMovement = false;
-		if (sprinting)
-		{
-			StopSprint();
-		}
-
+		LockPlayerRotation();
 		// if we haven't detected the boss yet, do it here
 		if (Boss == nullptr)
 		{
@@ -220,17 +207,53 @@ void ALudumDare49Character::ToggleLockOn()
 	}
 }
 
+void ALudumDare49Character::LockPlayerRotation()
+{
+		CameraBoom->bUsePawnControlRotation = false;
+		CameraBoom->bInheritPitch = false;
+		CameraBoom->bInheritYaw = true;
+		CameraBoom->bInheritRoll = false;
+		GetCharacterMovement()->bOrientRotationToMovement = false;
+}
+
+void ALudumDare49Character::UnlockPlayerRotation()
+{
+	CameraBoom->bUsePawnControlRotation = true;
+	CameraBoom->bInheritPitch = true;
+	CameraBoom->bInheritYaw = true;
+	CameraBoom->bInheritRoll = true;
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+}
+
 void ALudumDare49Character::Tick(float deltaTime)
 {
 	if (LockedOn && Controller != nullptr && Boss != nullptr)
 	{
+		HandleLockingOn(deltaTime);
+	}
+	HandleStamina();
+		Super::Tick(deltaTime);
+}
+
+void ALudumDare49Character::HandleLockingOn(float deltaTime)
+{
 		FVector playerPosition = GetActorLocation();
 		FVector bossPosition = Boss->GetActorLocation();
-		FVector flat = FVector(0.0f);
-		SetActorRotation(FRotationMatrix::MakeFromX(bossPosition - playerPosition).Rotator());
-		FRotator lockedRotation = FRotator(0.0f, GetActorQuat().Rotator().Yaw, GetActorQuat().Rotator().Roll);
-		SetActorRotation(lockedRotation);
-	}
+		FVector cameraPosition = CameraBoom->GetComponentLocation();
+		FRotator playerRot1 = FRotationMatrix::MakeFromX(bossPosition - playerPosition).Rotator();
+		CameraBoom->SetWorldRotation(FRotationMatrix::MakeFromX(bossPosition - cameraPosition).Rotator());
+		if (!sprinting)
+		{
+			SetActorRotation(FMath::RInterpTo(GetActorRotation(), FRotator(0.0f, playerRot1.Yaw, playerRot1.Roll), deltaTime, 10.0));
+			LockPlayerRotation();
+		}
+		else {
+			UnlockPlayerRotation();
+		}
+}
+
+void ALudumDare49Character::HandleStamina()
+{
 	if (sprinting)
 	{
 		if (stamina > 0.0f) {
@@ -248,11 +271,6 @@ void ALudumDare49Character::Tick(float deltaTime)
 			stamina += 0.8f;
 		}
 	}
-	if (doubleJumping)
-	{
-		//doubleJumping = false;
-	}
-	Super::Tick(deltaTime);
 }
 
 void ALudumDare49Character::DoubleJump()
@@ -304,22 +322,14 @@ void ALudumDare49Character::DepleteHealth(float amount)
 
 void ALudumDare49Character::StartSprint()
 {
-	if (!LockedOn)
-	{
-		GetCharacterMovement()->MaxWalkSpeed = sprintSpeed;
-		sprinting = true;
-	}
+	GetCharacterMovement()->MaxWalkSpeed = sprintSpeed;
+	sprinting = true;
 }
 
 void ALudumDare49Character::StopSprint()
 {
 	GetCharacterMovement()->MaxWalkSpeed = regularSpeed;
 	sprinting = false;
-	if (LockedOn)
-	{
-		dodging = true;
-		GetCharacterMovement()->MaxWalkSpeed = 0.0f;
-	}
 }
 
 void ALudumDare49Character::Attack()
